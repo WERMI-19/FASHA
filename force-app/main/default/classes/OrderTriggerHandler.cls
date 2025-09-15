@@ -2,7 +2,7 @@ public class OrderTriggerHandler {
     public static void handleAfterUpdate(List<Order> newOrders, Map<Id, Order> oldOrdersMap) {
         Map<Id, Decimal> accountIdToTotalAmount = new Map<Id, Decimal>();
 
-        // On ne traite que les commandes dont le statut passe à 'Activated'
+        // traite que les commandes dont le statut passe à 'Activated'
         for (Order newOrder : newOrders) {
             Order oldOrder = oldOrdersMap.get(newOrder.Id);
             if (newOrder.Status == 'Activated' && oldOrder.Status != 'Activated') {

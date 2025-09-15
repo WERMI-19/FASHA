@@ -15,11 +15,6 @@ global class UpdateProductPricesBatch implements Database.Batchable<sObject> {
         for (PricebookEntry pbe : scope) {
             // Logique de mise à jour : ici, on augmente le prix de 10%
             Decimal newPrice = pbe.UnitPrice * 1.10;
-            
-            // On ne peut pas modifier une PricebookEntry existante directement.
-            // La bonne pratique est de la cloner, la désactiver, et en insérer une nouvelle.
-            // CEPENDANT, pour une simple mise à jour de prix, Salesforce autorise la modification directe.
-            // Nous allons donc utiliser la méthode simple et performante.
             pbe.UnitPrice = newPrice;
             entriesToUpdate.add(pbe);
         }
