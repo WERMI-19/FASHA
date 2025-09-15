@@ -1,0 +1,53 @@
+# Nom du workflow
+name: Deploy and Validate Metadata
+
+# Déclencheurs du workflow
+on:
+  # Se déclenche sur les Pull Requests ouvertes ou mises à jour vers la branche main
+  pull_request:
+    branches:
+      - main
+  # Se déclenche également sur les push directs vers la branche main
+  push:
+    branches:
+      - main
+
+# Définition des jobs
+jobs:
+  sfdx-deploy:
+    name: "Run SFDX Deploy"
+    # Environnement d'exécution du job
+    runs-on: ubuntu-latest
+    
+    # Séquence des étapes du job
+    steps:
+      # Étape 1: Checkout du code source du dépôt
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      # Étape 2: Configuration de l'environnement Node.js
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Étape 3: Installation de la Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          npm install -g @salesforce/cli
+
+      # Étape 4: Authentification à l'org Salesforce via une URL d'authentification stockée en secret
+      - name: Authenticate to Salesforce Org
+        run: |
+          echo "${{ secrets.SF_AUTH_URL }}" > ./SF_AUTH_URL.txt
+          sf org login sfdx-url --sfdx-url-file ./SF_AUTH_URL.txt --alias my-org --set-default
+
+      # Étape 5: Déploiement des métadonnées sur Salesforce
+      - name: Deploy to Salesforce
+        # Condition: L'étape s'exécute uniquement pour les push sur la branche main
+        if: github.ref == 'refs/heads/main' 
+        run: |
+          # Déploie les métadonnées et exécute tous les tests locaux (Apex).
+          # Le déploiement échouera si un seul test ne passe pas.
+          sf project deploy start --target-org my-org --test-level RunLocalTests
