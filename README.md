@@ -18,11 +18,13 @@ cd [votre-repo]
 ```
 
 
+
 ### 2. Connexion à votre environnement Salesforce
 En utilisant Salesforce DX, connectez-vous à votre organisation Salesforce. Voir documentation : https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth_web_flow.htm
 
 ```bash
 sf org login web --alias my-org [nom-de-votre-org]
+
 ```
 
 ### 3. Déployer le projet sur Salesforce
