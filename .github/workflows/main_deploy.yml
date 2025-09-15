@@ -11,6 +11,8 @@ on:
   push:
     branches:
       - main
+  # Permet de lancer ce workflow manuellement depuis l'onglet Actions
+  workflow_dispatch:
 
 # Définition des jobs
 jobs:
@@ -45,13 +47,9 @@ jobs:
 
       # Étape 5: Déploiement des métadonnées sur Salesforce
       - name: Deploy to Salesforce
-        # Condition: L'étape s'exécute uniquement pour les push sur la branche main
-        if: github.ref == 'refs/heads/main' 
+        # Condition: L'étape s'exécute uniquement pour les push sur la branche main ou lors d'un déclenchement manuel
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
           # Déploie les métadonnées et exécute tous les tests locaux (Apex).
           # Le déploiement échouera si un seul test ne passe pas.
-<<<<<<< HEAD
           sf project deploy start --target-org my-org --test-level RunLocalTests
-=======
-          sf project deploy start --target-org my-org --test-level RunLocalTests
->>>>>>> ac0ede8c77205efb63245089bcf288837693abed
