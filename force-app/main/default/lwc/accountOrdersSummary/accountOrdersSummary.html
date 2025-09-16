@@ -1,30 +1,13 @@
 <template>
-    <lightning-card title="Somme des Commandes Activées" icon-name="standard:sales_path">
-        <lightning-button 
-            slot="actions" 
-            label="Actualiser" 
-            icon-name="utility:refresh" 
-            onclick={handleRefresh}>
-        </lightning-button>
-
-        <div class="slds-p-around_medium">
-            <template if:true={hasPositiveAmount}>
-                <div class="slds-box slds-theme_success">
-                    <h1>Total des Commandes : 
-                        <lightning-formatted-number 
-                            value={sumOrdersOfCurrentAccount} 
-                            format-style="currency" 
-                            currency-code="EUR">
-                        </lightning-formatted-number>
-                    </h1>
-                </div>
-            </template>
-            
-            <template if:false={hasPositiveAmount}>
-                <div class="slds-box slds-theme_error">
-                    <h1>Erreur, pas de commandes rattachées à ce compte ou le montant des commandes est égal à 0.</h1>
-                </div>
-            </template>
+    <template if:true={hasPositiveAmount}>
+        <div class="summary-box slds-p-around_medium">
+            Total des Commandes : {sumOrdersOfCurrentAccount}
         </div>
-    </lightning-card>
+    </template>
+    
+    <template if:false={hasPositiveAmount}>
+        <div class="slds-box slds-theme_error slds-p-around_medium">
+            Erreur, pas de commandes rattachées à ce compte ou le montant des commandes est égale à 0.
+        </div>
+    </template>
 </template>

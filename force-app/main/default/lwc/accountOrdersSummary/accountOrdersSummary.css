@@ -1,0 +1,7 @@
+/* Style pour la boîte de succès verte */
+.summary-box {
+    background-color: #2e844a; /*  vert */
+    color: white; /* Texte en blanc */
+    border-radius: .25rem; /* Bords légèrement arrondis */
+    font-weight: bold; /* Texte en gras */
+}
