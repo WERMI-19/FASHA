@@ -1,9 +1,22 @@
 <template>
     <lightning-card title="Somme des Commandes Activées" icon-name="standard:sales_path">
+        <lightning-button 
+            slot="actions" 
+            label="Actualiser" 
+            icon-name="utility:refresh" 
+            onclick={handleRefresh}>
+        </lightning-button>
+
         <div class="slds-p-around_medium">
             <template if:true={hasPositiveAmount}>
                 <div class="slds-box slds-theme_success">
-                    <h1>Total des Commandes : {sumOrdersOfCurrentAccount}</h1>
+                    <h1>Total des Commandes : 
+                        <lightning-formatted-number 
+                            value={sumOrdersOfCurrentAccount} 
+                            format-style="currency" 
+                            currency-code="EUR">
+                        </lightning-formatted-number>
+                    </h1>
                 </div>
             </template>
             
