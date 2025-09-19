@@ -7,7 +7,7 @@ private class ScheduleUpdateAccountsTest {
         String jobName = 'Test Mise à jour CA';
 
         Test.startTest();
-        System.schedule(jobName, cronExpression, new ScheduleUpdateAllAccounts());
+        System.schedule(jobName, cronExpression, new ScheduleUpdateAccounts());
         Test.stopTest();
 
         CronTrigger ct = [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :jobName];
