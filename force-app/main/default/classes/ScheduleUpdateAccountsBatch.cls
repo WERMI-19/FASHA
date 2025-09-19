@@ -2,7 +2,7 @@
  * @description Classe Apex planifiée (Schedulable) conçue pour lancer périodiquement
  * le processus de mise à jour en masse des comptes via une classe Batch.
  */
-global class ScheduleUpdateAccounts implements Schedulable {
+global class ScheduleUpdateAccountsBatch implements Schedulable {
     
     /**
      * @description Méthode exécutée automatiquement par le planificateur Salesforce.
