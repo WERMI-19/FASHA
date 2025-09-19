@@ -1,5 +1,5 @@
 @isTest
-private class ScheduleUpdateAllAccountsTest {
+private class ScheduleUpdateAccountsTest {
 
     @isTest
     static void testScheduler() {

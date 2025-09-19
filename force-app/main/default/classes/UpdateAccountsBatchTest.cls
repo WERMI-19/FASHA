@@ -1,5 +1,5 @@
 @isTest
-private class UpdateAllAccountsTest {
+private class UpdateAccountsBatchTest {
 
     @isTest static void testBatchExecution() {
         // 1. Création des données via la TestDataFactory
