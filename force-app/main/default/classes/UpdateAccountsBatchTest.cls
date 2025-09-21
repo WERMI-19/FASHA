@@ -15,7 +15,7 @@ private class UpdateAccountsBatchTest {
 
         // 3. Exécuter le batch
         Test.startTest();
-        Database.executeBatch(new UpdateAllAccounts());
+        Database.executeBatch(new UpdateAccountsBatch());
         Test.stopTest();
 
         // 4. Vérifier le résultat
