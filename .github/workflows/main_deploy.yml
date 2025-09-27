@@ -52,4 +52,4 @@ jobs:
         run: |
           # Déploie les métadonnées et exécute tous les tests locaux (Apex).
           # Le déploiement échouera si un seul test ne passe pas.
-          sf project deploy start --target-org my-org --test-level RunLocalTests
+          sf project deploy start --target-org FASHA --test-level RunLocalTests
