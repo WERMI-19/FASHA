@@ -43,7 +43,7 @@ private class OrdersControllerTest {
         System.assertEquals(0, total, 'Le montant total devrait être 0 car aucune commande n est activée.');
     }
 
-    // --- NOUVEAU TEST POUR LA COUVERTURE ---
+    // --- NOUVEAU TEST
     @isTest
     static void testGetSumOrders_WithNullId() {
         // --- Exécution de la méthode ---
