@@ -3,6 +3,7 @@
  * par exemple pour un recalcul nocturne du chiffre d'affaires.
  */
 global class UpdateAccountsBatch implements Database.Batchable<sObject>{
+    
     global Database.QueryLocator start(Database.BatchableContext info){ 
         return Database.getQueryLocator('SELECT Id FROM Account');
  

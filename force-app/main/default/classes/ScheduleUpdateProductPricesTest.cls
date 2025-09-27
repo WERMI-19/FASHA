@@ -3,20 +3,19 @@ private class ScheduleUpdateProductPricesTest {
 
     @isTest
     static void testScheduler() {
-        // Préparer l'expression CRON pour une exécution future
+        String jobName = 'Test Mise à jour des prix';
         String cronExpression = '0 0 2 ? * SUN';
-        String jobName = 'Test Mise à jour prix';
 
         Test.startTest();
-        // Planifier le job
+        
+        //  planifie le job. La logique à l'intérieur du scheduler utilisera Test.getStandardPricebookId()
         System.schedule(jobName, cronExpression, new ScheduleUpdateProductPrices());
+        
         Test.stopTest();
 
-        // Vérifier que le job a bien été planifié
-        CronTrigger ct = [SELECT Id, CronExpression, TimesTriggered, NextFireTime 
-                          FROM CronTrigger WHERE CronJobDetail.Name = :jobName];
-        
-        // Vérifier que l'expression CRON est correcte
+        // On vérifie simplement que le job a bien été ajouté à la file d'attente
+        CronTrigger ct = [SELECT Id, CronExpression FROM CronTrigger WHERE CronJobDetail.Name = :jobName];
+        System.assertNotEquals(null, ct, 'Le job de mise à jour des prix aurait dû être planifié.');
         System.assertEquals(cronExpression, ct.CronExpression);
     }
 }
