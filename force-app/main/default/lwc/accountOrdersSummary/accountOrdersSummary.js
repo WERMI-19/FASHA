@@ -1,14 +1,14 @@
 import { LightningElement, api, wire } from 'lwc';
-// Étape 1: Importer refreshApex
 import { refreshApex } from '@salesforce/apex';
 import getSumOrdersByAccount from '@salesforce/apex/OrdersController.getSumOrdersByAccount';
+//fonctions nécessaires importeés
 
 export default class AccountOrdersSummary extends LightningElement {
 
     @api recordId;
-    sumOrdersOfCurrentAccount;
+    sumOrdersOfCurrentAccount; //stocke la somme des montants des commandes récupérés depuis aPEX
     error;
-    wiredSumOrdersResult;
+    wiredSumOrdersResult;// pour stocker le résultat complet du @wire afin de pouvoir le rafraîchir
 
     @wire(getSumOrdersByAccount, { accountId: '$recordId' })
     wiredSumOrders(result) {
