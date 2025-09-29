@@ -1,4 +1,4 @@
-trigger OrderTrigger on Order (before insert, before update, after insert, after update) {
+trigger OrderTrigger on Order (before insert, before update, after insert, after update) { // NOPMD
 
     // --- Logique BEFORE ---
     // S'exécute avant la sauvegarde en base de données

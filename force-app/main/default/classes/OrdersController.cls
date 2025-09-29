@@ -3,7 +3,6 @@
  * pour garantir que le calcul du total inclut toutes les commandes pertinentes.
  */
 public without sharing class OrdersController {
-    
     /**
      * @description Calcule la somme des commandes activées pour un compte donné.
      * @param accountId L'ID du compte client.
@@ -11,23 +10,24 @@ public without sharing class OrdersController {
      */
     @AuraEnabled(cacheable=true)
     public static Decimal getSumOrdersByAccount(Id accountId) {
-        if (accountId == null) {
+        if (accountId == null){
             return 0;
         }
 
-        // Requête SOQL d'agrégation pour sommer  les montants côté base de données.
-        AggregateResult groupedResult = [
-            SELECT SUM(TotalAmount) total 
-            FROM Order 
-            WHERE AccountId = :accountId AND Status = 'Activated'
-        ];
-        
-        // Gère le cas où aucune commande ne correspond, car SUM() retourne alors null.
-        if (groupedResult != null && groupedResult.get('total') != null) {
-            return (Decimal)groupedResult.get('total');
+        // Vérification des permissions de lecture sur l'objet Order
+        if (!Schema.sObjectType.Order.isAccessible()) {
+            return 0;
         }
-        
-        return 0;
-    }
 
+        // Vérification des permissions sur les champs
+        if (!Schema.sObjectType.Order.fields.TotalAmount.isAccessible() ||
+            !Schema.sObjectType.Order.fields.AccountId.isAccessible() ||
+            !Schema.sObjectType.Order.fields.Status.isAccessible()) {
+            return 0;
+        }
+
+        AggregateResult[] results = [
+            SELECT SUM(TotalAmount) total FROM Order WHERE AccountId = :accountId AND Status = 'Activated'WITH SECURITY_ENFORCED];  // Clause de sécurité
+        return (Decimal)(results[0].get('total') != null ? results[0].get('total') : 0);
+    }
 }

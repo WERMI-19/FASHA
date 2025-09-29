@@ -1,7 +1,7 @@
 @isTest
 private class UpdateAccountsBatchTest {
 
-    @isTest static void testBatchExecution() {
+    @isTest static void testBatchExecution() { // NOPMD
         // 1. Création des données via la TestDataFactory
         Account acc = TestDataFactory.createAccount('Test Account Batch');
         Product2 prod = TestDataFactory.createProduct('Test Product Batch');

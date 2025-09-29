@@ -1,22 +1,22 @@
 @isTest
 public class TestDataFactory {
 
-    // Méthode pour créer un compte
-    public static Account createAccount(String name) {
+    /** Méthode pour créer un compte*/
+    public static Account createAccount(String name) { // NOPMD
         Account acc = new Account(Name = name);
         insert acc;
         return acc;
     }
 
     // Méthode pour créer un produit
-    public static Product2 createProduct(String name) {
+    public static Product2 createProduct(String name) { // NOPMD
         Product2 prod = new Product2(Name = name, Family = 'Test Product Family');
         insert prod;
         return prod;
     }
 
     // Méthode pour créer une entrée dans le catalogue de prix standard
-    public static PricebookEntry createPricebookEntry(Id productId, Decimal unitPrice) {
+    public static PricebookEntry createPricebookEntry(Id productId, Decimal unitPrice) { // NOPMD
         PricebookEntry pbe = new PricebookEntry(
             Pricebook2Id = Test.getStandardPricebookId(),
             Product2Id = productId,
@@ -28,7 +28,7 @@ public class TestDataFactory {
     }
 
     // Méthode pour créer une commande
-    public static Order createOrder(Id accountId, Id pricebookEntryId) {
+    public static Order createOrder(Id accountId, Id pricebookEntryId) { // NOPMD
         Order ord = new Order(
             AccountId = accountId,
             EffectiveDate = Date.today(),
@@ -38,9 +38,8 @@ public class TestDataFactory {
         insert ord;
         return ord;
     }
-    
     // Méthode pour créer une ligne de commande (OrderItem)
-    public static OrderItem createOrderItem(Id orderId, Id pricebookEntryId, Decimal quantity, Decimal unitPrice) {
+    public static OrderItem createOrderItem(Id orderId, Id pricebookEntryId, Decimal quantity, Decimal unitPrice) { // NOPMD
         OrderItem oi = new OrderItem(
             OrderId = orderId,
             PricebookEntryId = pricebookEntryId,

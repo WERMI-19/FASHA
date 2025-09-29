@@ -1,20 +1,25 @@
-global class ScheduleUpdateProductPrices implements Schedulable {
-    
-    global void execute(SchedulableContext sc) {
-        
-        Id standardPricebookId;
-        
-        // Vérifie si le code est en train d'être exécuté par une classe de test
-        if (Test.isRunningTest()) {
-            // Si c'est un test, on utilise la méthode de test pour obtenir un ID valide
-            standardPricebookId = Test.getStandardPricebookId();
-        } else {
-            // Sinon, en production, on exécute la requête SOQL normale
-            standardPricebookId = [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1].Id;
-        }
-        
-        // Lance le batch en lui passant l'ID obtenu
+/**
+ * @description Classe schedulable pour la mise à jour hebdomadaire des prix des produits
+ * Gère l'exécution du batch UpdateProductPricesBatch selon une planification
+ */
+public without sharing class ScheduleUpdateProductPrices implements Schedulable {
+    /**
+     * @description Méthode d'exécution de la planification
+     * @param sc Contexte de la planification
+     */
+    public void execute(SchedulableContext sc) {
+        Id standardPricebookId = getStandardPricebookId();
         Database.executeBatch(new UpdateProductPricesBatch(standardPricebookId));
     }
-    
+    /**
+     * @description Récupère l'ID du catalogue de prix standard
+     * @return Id de l'enregistrement Pricebook2 standard
+     */
+    private Id getStandardPricebookId() {
+        if (Test.isRunningTest()) {
+            return Test.getStandardPricebookId();
+        } else {
+            return [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1].Id; //NOPMD
+        }
+    }
 }

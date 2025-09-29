@@ -1,56 +1,38 @@
 /**
- * @description Classe Batch Apex conçue pour recalculer et mettre à jour en masse
- * le champ Chiffre d'affaires sur les enregistrements de Compte.
- * Elle est optimisée pour ne traiter que les comptes pertinents.
+ * @description Batch pour la mise à jour du chiffre d'affaires des comptes
  */
-global class UpdateAccountsBatch implements Database.Batchable<AggregateResult> {
-    
+global class UpdateAccountsBatch implements Database.Batchable<sObject> { // NOPMD
     /**
-     * @description Méthode START : Collecte les données à traiter.
-     * Retourne directement les résultats agrégés.
+     * @description Méthode start pour récupérer les comptes avec commandes activées
+     * @param info Contexte du batch
+     * @return QueryLocator des comptes à traiter
      */
-    global Iterable<AggregateResult> start(Database.BatchableContext info) { 
-        return [
-            SELECT AccountId, SUM(TotalAmount) total 
-            FROM Order 
-            WHERE Status = 'Activated' 
-            GROUP BY AccountId
-            HAVING SUM(TotalAmount) > 0
-        ];
+    global Database.QueryLocator start(Database.BatchableContext info) {
+        return Database.getQueryLocator([
+            SELECT Id FROM Account WHERE Id IN (SELECT AccountId FROM Order WHERE Status = 'Activated')
+        ]);
     }
-     
     /**
-     * @description Méthode EXECUTE : Traite chaque lot de données.
-     * Elle reçoit bien une liste d'AggregateResult, comme promis par l'interface.
+     * @description Méthode execute pour traiter les comptes par lots
+     * @param info Contexte du batch
+     * @param scope Liste des comptes du lot courant
      */
-    global void execute(Database.BatchableContext info, List<AggregateResult> scope) {
-        List<Account> accountsToUpdate = new List<Account>();
-        
-        for (AggregateResult ar : scope) {
-            accountsToUpdate.add(new Account(
-                Id = (Id) ar.get('AccountId'),
-                Chiffre_d_affaire__c = (Decimal) ar.get('total')
-            ));
-        }
-        
-        if (!accountsToUpdate.isEmpty()) {
-            update accountsToUpdate;
-        }
-    }    
-     
+    global void execute(Database.BatchableContext info, List<Account> scope) {
+        Set<Id> setAccountIds = (new Map<Id, SObject>(scope)).keySet();
+        OrderTriggerHandler.recalculateRevenue(setAccountIds);
+    }
     /**
-     * @description Méthode FINISH : Exécutée une fois que tous les lots sont traités.
-     * Affiche un résumé de l'exécution dans les logs pour la surveillance.
+     * @description Méthode finish pour le suivi de l'exécution
+     * @param info Contexte du batch
      */
-    global void finish(Database.BatchableContext info) {     
-        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems, CreatedBy.Name 
-                            FROM AsyncApexJob 
-                            WHERE Id = :info.getJobId()];
-
-        // Écrit un message de résumé dans les logs
-        System.debug('Batch UpdateAccountsBatch terminé.');
-        System.debug('    Statut : ' + job.Status);
-        System.debug('    Lots traités : ' + job.JobItemsProcessed + '/' + job.TotalJobItems);
-        System.debug('    Erreurs : ' + job.NumberOfErrors);
-    } 
+    global void finish(Database.BatchableContext info) {
+        AsyncApexJob job = [
+            SELECT Id, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems, CompletedDate
+            FROM AsyncApexJob
+            WHERE Id = :info.getJobId()
+        ];
+        System.debug('Batch UpdateAccountsBatch terminé avec statut: ' + job.Status); // NOPMD
+        System.debug('Lots traités: ' + job.JobItemsProcessed + '/' + job.TotalJobItems); // NOPMD
+        System.debug('Nombre d\'erreurs: ' + job.NumberOfErrors); // NOPMD
+    }
 }

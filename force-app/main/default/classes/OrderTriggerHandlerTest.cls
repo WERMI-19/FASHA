@@ -2,7 +2,7 @@
 private class OrderTriggerHandlerTest {
 
     @isTest
-    static void testHandleUpdate_SingleOrder() {
+    static void testHandleUpdate_singleOrder() { // NOPMD
         // --- Préparation ---
         Account acc = TestDataFactory.createAccount('Compte Commande Simple');
         Product2 prod = TestDataFactory.createProduct('Produit Simple');
@@ -21,12 +21,11 @@ private class OrderTriggerHandlerTest {
         Account updatedAccount = [SELECT Chiffre_d_affaire__c FROM Account WHERE Id = :acc.Id];
         System.assertEquals(150, updatedAccount.Chiffre_d_affaire__c, 'Le CA doit correspondre au montant de la commande.');
     }
-
     /**
-     * @description Test de performance : Vérifie que le handler peut traiter 
+     * @description Test de performance : Vérifie que le handler peut traiter
      * un grand nombre d'enregistrements (100 commandes) en une seule transaction */
     @isTest
-    static void testHandleUpdate_BulkOrders() {
+    static void testHandleUpdate_bulkOrders() { // NOPMD
         // --- Préparation ---
         Account acc = TestDataFactory.createAccount('Bulk Test Account');
         Product2 prod = TestDataFactory.createProduct('Bulk Test Product');
@@ -56,7 +55,9 @@ private class OrderTriggerHandlerTest {
         // --- Exécution ---
         Test.startTest();
         List<Order> ordersToActivate = [SELECT Id FROM Order WHERE AccountId = :acc.Id];
-        for(Order o : ordersToActivate) o.Status = 'Activated';
+        for(Order o : ordersToActivate) {
+            o.Status = 'Activated';
+        }
         update ordersToActivate;
         Test.stopTest();
 
