@@ -16,10 +16,7 @@ public with sharing class OrderTriggerHandler {
         Set<Id> accountIdsToRecalculate = new Set<Id>();
         for (Order newOrder : newOrders) {
             Order oldOrder = oldOrdersMap.get(newOrder.Id);
-            
             // On recalcule si :
-            // - le statut passe à 'Activated'
-            // - le statut quitte 'Activated'
             // - le montant total change sur une commande qui est déjà 'Activated'
             if ( (newOrder.Status == 'Activated' && oldOrder.Status != 'Activated') ||
                  (newOrder.Status != 'Activated' && oldOrder.Status == 'Activated') ||
@@ -46,12 +43,10 @@ public with sharing class OrderTriggerHandler {
         if (accountIds == null || accountIds.isEmpty()) {
             return;
         }
-
         // On s'assure que l'utilisateur a les droits de lire les commandes
         if (!Schema.sObjectType.Order.isAccessible()) {
             throw new System.SecurityException('Insufficient permissions to access Order records.');
         }
-        
         // 1. Agrégation de TOUTES les commandes activées pour les comptes concernés
         Map<Id, Decimal> accountTotalMap = new Map<Id, Decimal>();
         for (AggregateResult ar : [
@@ -68,7 +63,6 @@ public with sharing class OrderTriggerHandler {
         for (Id accountId : accountIds) {
             // On récupère le total calculé. S'il n'y a aucune commande activée, le total est 0.
             Decimal totalRevenue = accountTotalMap.containsKey(accountId) ? accountTotalMap.get(accountId) : 0;
-            
             accountsToUpdate.add(new Account(
                 Id = accountId,
                 Chiffre_d_affaire__c = totalRevenue
