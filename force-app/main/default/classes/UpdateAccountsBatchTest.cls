@@ -1,26 +1,27 @@
 @isTest
 private class UpdateAccountsBatchTest {
 
-    @isTest static void testBatchExecution() { // NOPMD
-        // 1. Création des données via la TestDataFactory
-        Account acc = TestDataFactory.createAccount('Test Account Batch');
-        Product2 prod = TestDataFactory.createProduct('Test Product Batch');
-        PricebookEntry pbe = TestDataFactory.createPricebookEntry(prod.Id, 100);
-        Order ord = TestDataFactory.createOrder(acc.Id, pbe.Id);
-        TestDataFactory.createOrderItem(ord.Id, pbe.Id, 5, 100); // 5 * 100 = 500
+    @isTest
+    static void testBatchExecution_CallsRevenueRecalculation() {
+        // Préparation - Compte avec commande activée
+        Account acc = TestDataFactory.createAccount('Test Batch Account');
+        Order ord = TestDataFactory.createOrder(acc.Id, null);
+        TestDataFactory.createOrderItem(ord.Id, 
+            TestDataFactory.createPricebookEntry(
+                TestDataFactory.createProduct('Test Prod').Id, 500).Id, 1, 500);
+        
+        // Activation de la commande
+        Order orderToActivate = [SELECT Id FROM Order WHERE Id = :ord.Id];
+        orderToActivate.Status = 'Activated';
+        update orderToActivate;
 
-        // 2. Mettre à jour la commande pour qu'elle soit "Activée"
-        ord.Status = 'Activated';
-        update ord;
-
-        // 3. Exécuter le batch
+        // Exécution du batch
         Test.startTest();
         Database.executeBatch(new UpdateAccountsBatch());
         Test.stopTest();
 
-        // 4. Vérifier le résultat
+        // Vérification que le CA a été mis à jour
         Account updatedAccount = [SELECT Chiffre_d_affaire__c FROM Account WHERE Id = :acc.Id];
-        // Le CA doit être égal au montant total de la commande
-        System.assertEquals(500, updatedAccount.Chiffre_d_affaire__c, 'Le chiffre d affaire du compte devrait etre mis a jour.');
+        System.assertEquals(500, updatedAccount.Chiffre_d_affaire__c, 'Le CA devrait être mis à jour par le batch');
     }
 }

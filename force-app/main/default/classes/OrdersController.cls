@@ -1,33 +1,28 @@
 /**
- * @description Controller Apex pour composants LWC. Le 'without sharing' est utilisé
- * pour garantir que le calcul du total inclut toutes les commandes pertinentes.
+ * Contrôleur pour le composant LWC accountOrdersSummary
+ * Gestion des données de commandes par compte
  */
-public without sharing class OrdersController {
+public with sharing class OrdersController {
+    
     /**
-     * @description Calcule la somme des commandes activées pour un compte donné.
-     * @param accountId L'ID du compte client.
-     * @return Le montant total (Decimal) ou 0 si aucun.
+     * Calcule le total des commandes activées pour un compte
+     * @param accountId ID du compte
+     * @return Somme totale des commandes activées
      */
     @AuraEnabled(cacheable=true)
     public static Decimal getSumOrdersByAccount(Id accountId) {
-        if (accountId == null){
+        if (accountId == null) {
             return 0;
         }
 
-        // Vérification des permissions de lecture sur l'objet Order
-        if (!Schema.sObjectType.Order.isAccessible()) {
-            return 0;
-        }
-
-        // Vérification des permissions sur les champs
-        if (!Schema.sObjectType.Order.fields.TotalAmount.isAccessible() ||
-            !Schema.sObjectType.Order.fields.AccountId.isAccessible() ||
-            !Schema.sObjectType.Order.fields.Status.isAccessible()) {
-            return 0;
-        }
-
-        AggregateResult[] results = [
-            SELECT SUM(TotalAmount) total FROM Order WHERE AccountId = :accountId AND Status = 'Activated'WITH SECURITY_ENFORCED];  // Clause de sécurité
-        return (Decimal)(results[0].get('total') != null ? results[0].get('total') : 0);
+        // Récupère directement la somme depuis la base
+        AggregateResult groupedResult = [
+            SELECT SUM(TotalAmount) total 
+            FROM Order 
+            WHERE AccountId = :accountId AND Status = 'Activated'
+        ];
+        
+        // Retourne la somme ou 0 si aucun résultat
+        return (Decimal)groupedResult.get('total') != null ? (Decimal)groupedResult.get('total') : 0;
     }
 }

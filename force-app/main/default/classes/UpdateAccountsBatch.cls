@@ -1,38 +1,33 @@
 /**
- * @description Batch pour la mise à jour du chiffre d'affaires des comptes
+ * Batch de mise à jour du chiffre d'affaires des comptes
+ * Utilise AccountService pour le calcul du CA
  */
-global class UpdateAccountsBatch implements Database.Batchable<sObject> { // NOPMD
+global class UpdateAccountsBatch implements Database.Batchable<sObject> {
+    
     /**
-     * @description Méthode start pour récupérer les comptes avec commandes activées
-     * @param info Contexte du batch
-     * @return QueryLocator des comptes à traiter
+     * Récupère les comptes ayant au moins une commande
      */
-    global Database.QueryLocator start(Database.BatchableContext info) {
+    global Database.QueryLocator start(Database.BatchableContext info) { 
         return Database.getQueryLocator([
-            SELECT Id FROM Account WHERE Id IN (SELECT AccountId FROM Order WHERE Status = 'Activated')
+            SELECT Id 
+            FROM Account
+            WHERE Id IN (SELECT AccountId FROM Order)
         ]);
     }
+     
     /**
-     * @description Méthode execute pour traiter les comptes par lots
-     * @param info Contexte du batch
-     * @param scope Liste des comptes du lot courant
+     * Déclenche le recalcul du CA pour les comptes du lot
      */
     global void execute(Database.BatchableContext info, List<Account> scope) {
-        Set<Id> setAccountIds = (new Map<Id, SObject>(scope)).keySet();
-        OrderTriggerHandler.recalculateRevenue(setAccountIds);
-    }
+        Set<Id> accountIds = (new Map<Id, Account>(scope)).keySet();
+        AccountService.recalculateRevenue(accountIds);
+    }    
+     
     /**
-     * @description Méthode finish pour le suivi de l'exécution
-     * @param info Contexte du batch
+     * Log de fin de traitement du batch
      */
-    global void finish(Database.BatchableContext info) {
-        AsyncApexJob job = [
-            SELECT Id, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems, CompletedDate
-            FROM AsyncApexJob
-            WHERE Id = :info.getJobId()
-        ];
-        System.debug('Batch UpdateAccountsBatch terminé avec statut: ' + job.Status); // NOPMD
-        System.debug('Lots traités: ' + job.JobItemsProcessed + '/' + job.TotalJobItems); // NOPMD
-        System.debug('Nombre d\'erreurs: ' + job.NumberOfErrors); // NOPMD
-    }
+    global void finish(Database.BatchableContext info) {     
+        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors FROM AsyncApexJob WHERE Id = :info.getJobId()];
+        System.debug('Batch UpdateAccountsBatch terminé. Statut : ' + job.Status + '. Erreurs: ' + job.NumberOfErrors);
+    } 
 }

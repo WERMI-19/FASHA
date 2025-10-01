@@ -1,23 +1,19 @@
-trigger OrderTrigger on Order (before insert, before update, after insert, after update) { // NOPMD
-
-    // --- Logique BEFORE ---
-    // S'exécute avant la sauvegarde en base de données
+/**
+ * @description Trigger unique pour l'objet Order.
+ * Délègue toute la logique à la classe OrderTriggerHandler.
+ */
+trigger OrderTrigger on Order (before insert, before update, after insert, after update) {
+         // Logique BEFORE 
     if (Trigger.isBefore) {
         if (Trigger.isInsert || Trigger.isUpdate) {
-            // Ancien trigger "CalculMontant"
-            for (Order newOrder : Trigger.new) {
-                Decimal totalAmount = newOrder.TotalAmount != null ? newOrder.TotalAmount : 0;
-                Decimal shipmentCost = newOrder.ShipmentCost__c != null ? newOrder.ShipmentCost__c : 0;
-                newOrder.NetAmount__c = totalAmount - shipmentCost;
-            }
+            // Appelle la méthode pour la logique "before"
+            OrderTriggerHandler.handleBeforeInsertUpdate(Trigger.new);
         }
     }
-
-    // --- Logique AFTER ---
-    // S'exécute après la sauvegarde en base de données
+           //Logique AFTER 
     if (Trigger.isAfter) {
         if (Trigger.isUpdate) {
-            // Ancien trigger "UpdateAccountCA"
+            // Appelle la méthode pour la logique "after"
             OrderTriggerHandler.handleAfterUpdate(Trigger.new, Trigger.oldMap);
         }
     }

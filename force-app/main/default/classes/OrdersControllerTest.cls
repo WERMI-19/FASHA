@@ -1,55 +1,54 @@
-/**
- * @description Classe de test pour OrdersController
- */
 @isTest
 private class OrdersControllerTest {
-    /**
-     * @description Teste le calcul avec une commande activée
-     */
+
     @isTest
-    static void getSumOrdersWithActivatedOrderShouldReturnTotal() { // NOPMD
+    static void testGetSumOrders_WithActivatedOrder() {
+        // Préparation - Compte avec commande activée
         Account acc = TestDataFactory.createAccount('Test Account LWC');
-        Product2 prod = TestDataFactory.createProduct('Test Product LWC');
-        PricebookEntry pbe = TestDataFactory.createPricebookEntry(prod.Id, 250);
-        Order ord = TestDataFactory.createOrder(acc.Id, pbe.Id);
-        TestDataFactory.createOrderItem(ord.Id, pbe.Id, 2, 250);
-        ord.Status = 'Activated';
-        update ord;
+        Order ord = TestDataFactory.createOrder(acc.Id, null);
+        
+        // Ajout d'une ligne de commande (montant total = 500)
+        TestDataFactory.createOrderItem(ord.Id, 
+            TestDataFactory.createPricebookEntry(
+                TestDataFactory.createProduct('Test Prod').Id, 250).Id, 2, 250);
+        
+        // Activation de la commande
+        Order orderToActivate = [SELECT Id FROM Order WHERE Id = :ord.Id];
+        orderToActivate.Status = 'Activated';
+        update orderToActivate;
 
+        // Exécution
         Test.startTest();
         Decimal total = OrdersController.getSumOrdersByAccount(acc.Id);
         Test.stopTest();
 
-        System.assertEquals(500, total, 'Le montant total des commandes activées devrait être 500.');
+        // Vérification
+        System.assertEquals(500, total, 'Le total des commandes activées devrait être 500');
     }
 
-    /**
-     * @description Teste le calcul sans commande activée
-     */
     @isTest
-    static void getSumOrdersWithNoActivatedOrderShouldReturnZero() { // NOPMD
+    static void testGetSumOrders_WithNoActivatedOrder() {
+        // Compte avec commande en statut Draft (non activée)
         Account acc = TestDataFactory.createAccount('Test Account LWC No Order');
-        Product2 prod = TestDataFactory.createProduct('Test Product LWC No Order');
-        PricebookEntry pbe = TestDataFactory.createPricebookEntry(prod.Id, 250);
-        Order ord = TestDataFactory.createOrder(acc.Id, pbe.Id);
-        TestDataFactory.createOrderItem(ord.Id, pbe.Id, 2, 250);
+        TestDataFactory.createOrder(acc.Id, null);
 
+        // Exécution
         Test.startTest();
         Decimal total = OrdersController.getSumOrdersByAccount(acc.Id);
         Test.stopTest();
 
-        System.assertEquals(0, total, 'Le montant total devrait être 0 car aucune commande activée.');
+        // Vérification
+        System.assertEquals(0, total, 'Doit retourner 0 quand aucune commande activée');
     }
 
-    /**
-     * @description Teste le comportement avec un ID null
-     */
     @isTest
-    static void getSumOrdersWithNullIdShouldReturnZero() { // NOPMD
+    static void testGetSumOrders_WithNullId() {
+        // Exécution avec ID null
         Test.startTest();
         Decimal total = OrdersController.getSumOrdersByAccount(null);
         Test.stopTest();
 
-        System.assertEquals(0, total, 'Le montant total devrait être 0 quand accountId est null.');
+        // Vérification
+        System.assertEquals(0, total, 'Doit retourner 0 quand accountId est null');
     }
 }
