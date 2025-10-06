@@ -1,5 +1,5 @@
 # Nom du workflow
-name: Deploy and Validate Metadata
+name: Test adn Deploy SFDX
 
 # Déclencheurs du workflow
 on:

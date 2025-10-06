@@ -1,7 +1,7 @@
 # Configuration Code Analyzer Salesforce
 # Documentation: https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/config-custom.html
 
-config_root: null # Calculé: "/Users/mac/Desktop/FASHA"
+config_root: null # Calculé: Répertoire courant
 log_folder: null # Dossier temporaire système
 log_level: 4 # Niveau Debug
 

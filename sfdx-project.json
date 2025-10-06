@@ -5,7 +5,7 @@
         "default": true
       }
     ],
-    "namespace": "",
-    "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "60.0"
+    "namespace": "FASHA",
+    "sfdcLoginUrl": "https://mindful-fox-v8lhr6-dev-ed.trailblaze.my.salesforce.com",
+    "sourceApiVersion": "64.0"
   }
